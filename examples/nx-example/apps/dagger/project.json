@@ -4,30 +4,10 @@
   "sourceRoot": "apps/dagger/src",
   "projectType": "application",
   "targets": {
-    "build": {
-      "executor": "@nrwl/webpack:webpack",
-      "outputs": ["{options.outputPath}"],
-      "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/dagger",
-        "main": "apps/dagger/src/main.ts",
-        "tsConfig": "apps/dagger/tsconfig.app.json"
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false
-        }
-      }
-    },
     "serve": {
-      "executor": "@nrwl/js:node",
+      "executor": "nx:run-commands",
       "options": {
-        "buildTarget": "dagger:build"
-      },
-      "configurations": {
+        "command": "ts-node --esm --project=apps/dagger/tsconfig.json apps/dagger/src/main.ts"
       }
     },
     "lint": {
