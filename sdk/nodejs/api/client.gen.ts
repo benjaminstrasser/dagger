@@ -3,7 +3,7 @@
  * Do not make direct changes to the file.
  */
 
-import { GraphQLClient, gql } from "graphql-request"
+import { GraphQLClient, gql, ClientError } from "graphql-request"
 import { queryBuilder, queryFlatten } from "./utils.js"
 
 /**
@@ -57,8 +57,14 @@ class BaseClient {
       )
 
       return queryFlatten(computeQuery)
-    } catch (error) {
-      throw Error(`Error: ${JSON.stringify(error, undefined, 2)}`)
+    } catch (e) {
+      if (e instanceof ClientError && e.response.errors) {
+        // TODO: Decide what the error should be
+        throw new Error(e.response.errors[0].message)
+      }
+
+      // Just throw the unknown error
+      throw e
     }
   }
 }
