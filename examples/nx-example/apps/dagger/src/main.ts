@@ -1,13 +1,10 @@
 import Client, {connect} from "@dagger.io/dagger"
+import * as api from "../../api/dagger"
 
-
-connect(async (client:  Client) => {
-  const ctr = client
-    .container()
-    .from("node")
-    .withEntrypoint(["cowsay"])
-
-  const result = await ctr.exec(["Hello"]).stdout().contents()
-
-  console.log(result.contents)
+// initialize Dagger client
+connect(async (client: Client) => {
+  await api.build(client);
+}).catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
 })

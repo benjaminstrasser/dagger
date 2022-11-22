@@ -7,7 +7,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node --esm --project=apps/dagger/tsconfig.json apps/dagger/src/main.ts"
+        "command": "ts-node --esm --project=apps/dagger/tsconfig.app.json apps/dagger/src/main.ts --experimental-specifier-resolution=node"
       }
     },
     "lint": {

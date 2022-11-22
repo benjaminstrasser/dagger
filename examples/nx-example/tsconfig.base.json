@@ -16,8 +16,14 @@
     "baseUrl": ".",
     "paths": {
       "@nx-example/api-interfaces": ["libs/api-interfaces/src/index.ts"],
-      "@nx-example/api": ["apps/api/"],
-      "@nx-example/nx-example": ["apps/nx-example/"]
+      "@nx-example/api/*": ["apps/api/*"],
+      "@nx-example/nx-example": ["apps/nx-example/"],
+      "@nx-example/dagger/*": ["apps/dagger/src/*"]
+    }
+  },
+  "ts-node": {
+    "moduleTypes": {
+      "**/dagger/**/*.ts": "esm"
     }
   },
   "exclude": ["node_modules", "tmp"]

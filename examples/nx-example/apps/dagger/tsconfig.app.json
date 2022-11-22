@@ -3,7 +3,11 @@
   "compilerOptions": {
     "module": "ESNext",
     "types": ["node"],
-    "target": "ES2020"
+    "target": "ES2020",
+    "paths": {
+      "@nx-example/api": ["apps/api/dagger"],
+      "@nx-example/nx-workspace": ["apps/dagger/src/nx-workspace"],
+    }
   },
   "exclude": ["jest.config.ts", "**/*.spec.ts", "**/*.test.ts"],
   "include": ["**/*.ts"]
