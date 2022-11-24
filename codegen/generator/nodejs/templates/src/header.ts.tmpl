@@ -5,6 +5,7 @@
  */
 
 import { GraphQLClient, gql, ClientError } from "graphql-request";
+import { GraphQLRequestError, UnknownDaggerError } from "../common/errors.js"
 import { queryBuilder, queryFlatten } from "./utils.js"
 
 /**
@@ -59,13 +60,19 @@ class BaseClient {
 
       return queryFlatten(computeQuery)
     } catch (e) {
-      if (e instanceof ClientError && e.response.errors) {
-        // TODO: Decide what the error should be
-        throw new Error(e.response.errors[0].message)
+      if (e instanceof ClientError) {
+        throw new GraphQLRequestError("Error message", {
+          request: e.request,
+          response: e.response,
+          cause: e,
+        })
       }
 
       // Just throw the unknown error
-      throw e
+      throw new UnknownDaggerError(
+        "Encountered an unknown error while requesting data via graphql",
+        { cause: e as Error }
+      )
     }
   }
 }

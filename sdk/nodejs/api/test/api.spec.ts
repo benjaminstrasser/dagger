@@ -1,4 +1,5 @@
 import assert from "assert"
+import { TooManyNestedObjectsError } from "../../common/errors.js"
 import Client from "../client.gen.js"
 import { queryBuilder, queryFlatten } from "../utils.js"
 
@@ -76,9 +77,6 @@ describe("NodeJS SDK api", function () {
       },
     }
 
-    assert.throws(
-      () => queryFlatten(tree),
-      Error("Too many Graphql nested objects")
-    )
+    assert.throws(() => queryFlatten(tree), TooManyNestedObjectsError)
   })
 })
