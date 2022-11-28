@@ -9,7 +9,8 @@ import {
   DockerImageRefValidationError,
   EngineSessionPortParseError,
   InitEngineSessionBinaryError,
-} from "../../common/errors.js"
+} from "../../common/errors/index.js"
+import { log } from "../../common/utils.js"
 
 /**
  * ImageRef is a simple abstraction of docker image reference.
@@ -57,9 +58,15 @@ class ImageRef {
    */
   static validate(ref: string): void {
     if (!ref.includes("@sha256:")) {
-      throw new DockerImageRefValidationError(`no digest found in ref ${ref}`, {
-        ref: ref,
-      })
+      throw new DockerImageRefValidationError(
+        log(
+          DockerImageRefValidationError.name,
+          `no digest found in ref ${ref}`
+        ),
+        {
+          ref: ref,
+        }
+      )
     }
   }
 }
@@ -203,7 +210,10 @@ export class DockerImage implements EngineConn {
     } catch (e) {
       fs.rmSync(tmpBinPath)
       throw new InitEngineSessionBinaryError(
-        `failed to copy engine session binary: ${e}`,
+        log(
+          InitEngineSessionBinaryError.name,
+          `failed to copy engine session binary: ${e}`
+        ),
         { cause: e as Error }
       )
     }
@@ -272,7 +282,10 @@ export class DockerImage implements EngineConn {
         setTimeout(() => {
           reject(
             new EngineSessionPortParseError(
-              "timeout reading port from engine session"
+              log(
+                EngineSessionPortParseError.name,
+                "timeout reading port from engine session"
+              )
             )
           )
         }, 300000).unref() // long timeout to account for extensions, though that should be optimized in future

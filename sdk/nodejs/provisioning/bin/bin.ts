@@ -2,7 +2,8 @@ import { ConnectOpts, EngineConn } from "../engineconn.js"
 import readline from "readline"
 import { execaCommand, ExecaChildProcess } from "execa"
 import Client from "../../api/client.gen.js"
-import { EngineSessionPortParseError } from "../../common/errors.js"
+import { EngineSessionPortParseError } from "../../common/errors/index.js"
+import { log } from "../../common/utils.js"
 
 /**
  * Bin runs an engine session from a specified binary
@@ -64,7 +65,10 @@ export class Bin implements EngineConn {
         setTimeout(() => {
           reject(
             new EngineSessionPortParseError(
-              "timeout reading port from engine session"
+              log(
+                EngineSessionPortParseError.name,
+                "timeout reading port from engine session"
+              )
             )
           )
         }, 300000).unref() // long timeout to account for extensions, though that should be optimized in future

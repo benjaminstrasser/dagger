@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { TooManyNestedObjectsError } from "../common/errors.js"
+import { TooManyNestedObjectsError } from "../common/errors/index.js"
+import { log } from "../common/utils.js"
 import { QueryTree } from "./client.gen.js"
 
 export function queryBuilder(q: QueryTree[]) {
@@ -55,7 +56,10 @@ export function queryFlatten<T>(response: any): T {
     // Dagger is currently expecting to only return one value
     // If the response is nested in a way were more than one object is nested inside throw an error
     throw new TooManyNestedObjectsError(
-      "Too many nested objects inside graphql response",
+      log(
+        TooManyNestedObjectsError?.name,
+        "Too many nested objects inside graphql response"
+      ),
       { response: response }
     )
   }

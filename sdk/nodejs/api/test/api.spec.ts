@@ -1,6 +1,6 @@
 import assert from "assert"
-import { TooManyNestedObjectsError } from "../../common/errors.js"
-import Client from "../client.gen.js"
+import { TooManyNestedObjectsError } from "../../common/errors/index.js"
+import Client from "../../index.js"
 import { queryBuilder, queryFlatten } from "../utils.js"
 
 describe("NodeJS SDK api", function () {

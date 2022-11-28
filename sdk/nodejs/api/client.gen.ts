@@ -4,8 +4,12 @@
  */
 
 import { GraphQLClient, gql, ClientError } from "graphql-request"
-import { GraphQLRequestError, UnknownDaggerError } from "../common/errors.js"
+import {
+  GraphQLRequestError,
+  UnknownDaggerError,
+} from "../common/errors/index.js"
 import { queryBuilder, queryFlatten } from "./utils.js"
+import { log } from "../common/utils.js"
 
 /**
  * @hidden
@@ -51,27 +55,29 @@ class BaseClient {
     try {
       // run the query and return the result.
       const query = queryBuilder(this._queryTree)
-      const computeQuery: Awaited<T> = await this.client.request(
+      const computeQuery = await this.client.request(
         gql`
           ${query}
         `
       )
 
       return queryFlatten(computeQuery)
-    } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e: any) {
       if (e instanceof ClientError) {
-        throw new GraphQLRequestError("Error message", {
-          request: e.request,
-          response: e.response,
-          cause: e,
-        })
+        throw new GraphQLRequestError(
+          log(GraphQLRequestError?.name, e.message),
+          {
+            request: e.request,
+            response: e.response,
+            cause: e,
+          }
+        )
       }
-
       // Just throw the unknown error
-      throw new UnknownDaggerError(
-        "Encountered an unknown error while requesting data via graphql",
-        { cause: e as Error }
-      )
+      throw new UnknownDaggerError(log(UnknownDaggerError?.name, e.message), {
+        cause: e as Error,
+      })
     }
   }
 }
