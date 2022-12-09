@@ -82,17 +82,22 @@ func (t Nodejs) Generate(ctx context.Context) error {
 }
 
 // Publish publishes the Node.js SDK
-func (t Nodejs) Publish(ctx context.Context, tag string) error {
+func (t Nodejs) Publish(ctx context.Context, ref string) error {
 	c, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stderr))
 	if err != nil {
 		return err
 	}
 	defer c.Close()
 
-	var (
-		version  = strings.TrimPrefix(tag, "sdk/nodejs/v")
-		token, _ = util.WithSetHostVar(ctx, c.Host(), "NPM_TOKEN").Secret().Plaintext(ctx)
-	)
+	var version string
+
+	if strings.HasPrefix(ref, "refs/heads/") {
+		version = "rc_" + strings.TrimPrefix(ref, "refs/heads/")
+	} else if strings.HasPrefix(ref, "refs/stage/") {
+		version = strings.TrimPrefix(ref, "refs/stage/sdk/nodejs/v")
+	}
+
+	var token, _ = util.WithSetHostVar(ctx, c.Host(), "NPM_TOKEN").Secret().Plaintext(ctx)
 
 	build := nodeJsBase(c).WithExec([]string{"npm", "run", "build"})
 
