@@ -2,7 +2,11 @@ import { ConnectOpts, EngineConn } from "../engineconn.js"
 import readline from "readline"
 import { execaCommand, ExecaChildProcess } from "execa"
 import Client from "../../api/client.gen.js"
-import { EngineSessionPortParseError } from "../../common/errors/index.js"
+import {
+  EngineSessionConnectionTimeoutError,
+  EngineSessionEOFError,
+  EngineSessionPortParseError,
+} from "../../common/errors/index.js"
 
 /**
  * Bin runs an engine session from a specified binary
@@ -58,16 +62,19 @@ export class Bin implements EngineConn {
       input: this.subProcess.stdout!,
     })
 
+    const timeOutDuration = 30000
+
     const port = await Promise.race([
       this.readPort(stdoutReader),
       new Promise((_, reject) => {
         setTimeout(() => {
           reject(
-            new EngineSessionPortParseError(
-              "timeout reading port from engine session"
+            new EngineSessionConnectionTimeoutError(
+              "timeout reading port from engine session",
+              { timeOutDuration }
             )
           )
-        }, 300000).unref() // long timeout to account for extensions, though that should be optimized in future
+        }, timeOutDuration).unref() // long timeout to account for extensions, though that should be optimized in future
       }),
     ])
 
@@ -86,7 +93,7 @@ export class Bin implements EngineConn {
       }
       return port
     }
-    throw new EngineSessionPortParseError(
+    throw new EngineSessionEOFError(
       "No line was found to parse the engine port"
     )
   }

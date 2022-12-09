@@ -7,6 +7,8 @@ import { execaCommandSync, execaCommand, ExecaChildProcess } from "execa"
 import Client from "../../api/client.gen.js"
 import {
   DockerImageRefValidationError,
+  EngineSessionConnectionTimeoutError,
+  EngineSessionEOFError,
   EngineSessionPortParseError,
   InitEngineSessionBinaryError,
 } from "../../common/errors/index.js"
@@ -266,16 +268,19 @@ export class DockerImage implements EngineConn {
       input: this.subProcess.stdout!,
     })
 
+    const timeOutDuration = 30000
+
     const port = await Promise.race([
       this.readPort(stdoutReader),
       new Promise((_, reject) => {
         setTimeout(() => {
           reject(
-            new EngineSessionPortParseError(
-              "timeout reading port from engine session"
+            new EngineSessionConnectionTimeoutError(
+              "timeout reading port from engine session",
+              { timeOutDuration }
             )
           )
-        }, 300000).unref() // long timeout to account for extensions, though that should be optimized in future
+        }, timeOutDuration).unref() // long timeout to account for extensions, though that should be optimized in future
       }),
     ])
 
@@ -294,7 +299,7 @@ export class DockerImage implements EngineConn {
       }
       return port
     }
-    throw new EngineSessionPortParseError(
+    throw new EngineSessionEOFError(
       "No line was found to parse the engine port"
     )
   }

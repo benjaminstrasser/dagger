@@ -5,11 +5,7 @@ interface EngineSessionPortParseErrorOptions extends DaggerSDKErrorOptions {
 }
 
 /**
- * This error is thrown if the EngineSession does not manage to parse the required port successfully.
- * This can happen if
- * - Reading the port times out after 30 seconds
- * - The parsed port is not a number
- * - the reader does not read a single line
+ * This error is thrown if the EngineSession does not manage to parse the required port successfully because the parsed port is not a number.
  */
 export class EngineSessionPortParseError extends DaggerSDKError {
   name = "EngineSessionPortError"
@@ -18,13 +14,13 @@ export class EngineSessionPortParseError extends DaggerSDKError {
   /**
    *  the line, which caused the error during parsing, if the error was caused because of parsing.
    */
-  parsedLine?: string
+  parsedLine: string
 
   /**
    * @hidden
    */
-  constructor(message: string, options?: EngineSessionPortParseErrorOptions) {
+  constructor(message: string, options: EngineSessionPortParseErrorOptions) {
     super(message, options)
-    if (options) this.parsedLine = options.parsedLine
+    this.parsedLine = options.parsedLine
   }
 }
