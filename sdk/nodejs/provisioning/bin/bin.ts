@@ -100,7 +100,7 @@ export class Bin implements EngineConn {
       )
     }
     throw new EngineSessionEOFError(
-      "No line was found to parse the engine port"
+      "No line was found to parse the engine connect params"
     )
   }
 
