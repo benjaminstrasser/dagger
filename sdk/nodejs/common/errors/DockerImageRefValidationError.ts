@@ -10,8 +10,8 @@ interface DockerImageRefValidationErrorOptions extends DaggerSDKErrorOptions {
  *  DockerImage constructor.
  */
 export class DockerImageRefValidationError extends DaggerSDKError {
-  name = "DockerImageRefValidationError"
-  code = errorCodes.DockerImageRefValidationError
+  readonly name = "DockerImageRefValidationError"
+  readonly code = errorCodes.DockerImageRefValidationError
 
   /**
    *  The docker image reference, which caused the error.

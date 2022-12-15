@@ -10,8 +10,8 @@ interface EngineSessionConnectParamsParseErrorOptions
  * This error is thrown if the EngineSession does not manage to parse the required connection parameters from the session binary
  */
 export class EngineSessionConnectParamsParseError extends DaggerSDKError {
-  name = "EngineSessionConnectParamsParseError"
-  code = errorCodes.EngineSessionConnectParamsParseError
+  readonly name = "EngineSessionConnectParamsParseError"
+  readonly code = errorCodes.EngineSessionConnectParamsParseError
 
   /**
    *  the line, which caused the error during parsing, if the error was caused because of parsing.
