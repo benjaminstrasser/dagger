@@ -16,7 +16,7 @@ func New(
 		SDKSourceDir: sdkSourceDir,
 		RequiredPaths: []string{
 			"**/package.json",
-			"**/package-lock.json",
+			"**/bun.lockb",
 			"**/tsconfig.json",
 		},
 	}
@@ -51,14 +51,13 @@ func (t *TypeScriptSdk) ModuleRuntime(ctx context.Context, modSource *ModuleSour
 	}
 
 	entrypointPath := path.Join(ModSourceDirPath, subPath, EntrypointExecutablePath)
-	tsConfigPath := path.Join(ModSourceDirPath, subPath, "tsconfig.json")
 	return ctr.
 		// Install dependencies
-		WithExec([]string{"npm", "install"}).
+		WithExec([]string{"bun", "install"}).
 		WithMountedFile(entrypointPath, ctr.Directory("/opt/bin").File(EntrypointExecutableFile)).
 		// need to specify --tsconfig because final runtime container will change working directory to a separate scratch
 		// dir, without this the paths mapped in the tsconfig.json will not be used and js module loading will fail
-		WithEntrypoint([]string{"tsx", "--tsconfig", tsConfigPath, entrypointPath}), nil
+		WithEntrypoint([]string{"bun", entrypointPath}), nil
 }
 
 // Codegen returns the generated API client based on user's module
@@ -127,13 +126,11 @@ func (t *TypeScriptSdk) CodegenBase(ctx context.Context, modSource *ModuleSource
 			"runtime",
 		},
 	}).
-		// Add tsx to execute the entrypoint
-		WithExec([]string{"npm", "install", "-g", "tsx"}).
 		// Check if the project has existing source:
 		// if it does: add sdk as dev dependency
 		// if not: copy the template and replace QuickStart with the module name
 		WithExec([]string{"sh", "-c",
-			"if [ -f package.json ]; then  npm install --package-lock-only ./sdk  --dev  && tsx /opt/bin/__tsconfig.updator.ts; else cp -r /opt/template/*.json .; fi",
+			"if [ -f package.json ]; then  bun install ./sdk  --dev  && bun /opt/bin/__tsconfig.updator.ts; else cp -r /opt/template/*.json .; fi",
 		},
 			ContainerWithExecOpts{SkipEntrypoint: true},
 		).
@@ -148,11 +145,11 @@ func (t *TypeScriptSdk) CodegenBase(ctx context.Context, modSource *ModuleSource
 // Base returns a Node container with cache setup for yarn
 func (t *TypeScriptSdk) Base(version string) *Container {
 	if version == "" {
-		version = "21.3-alpine"
+		version = "1.0.27-alpine"
 	}
 
 	return dag.Container().
-		From(fmt.Sprintf("node:%s", version)).
-		WithMountedCache("/root/.npm", dag.CacheVolume("mod-npm-cache-"+version)).
+		From(fmt.Sprintf("oven/bun:%s", version)).
+		WithMountedCache("~/.bun/install/cache", dag.CacheVolume("mod-bun-cache-"+version)).
 		WithoutEntrypoint()
 }

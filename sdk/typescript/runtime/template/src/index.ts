@@ -4,11 +4,15 @@ import { dag, Container, Directory, object, func } from "@dagger.io/dagger"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 class QuickStart {
   /**
-   * example usage: "dagger call container-echo --string-arg yo stdout"
+   * example usage: "dagger call container-echo stdout"
    */
   @func()
-  containerEcho(stringArg: string): Container {
-    return dag.container().from("alpine:latest").withExec(["echo", stringArg])
+  containerEcho(): Container {
+    const isBunRuntime = typeof Bun === "object";
+    return dag
+      .container()
+      .from("alpine:latest")
+      .withExec(["echo", `Running inside Bun? ${isBunRuntime ? "yes" : "no"}`])
   }
 
   /**
